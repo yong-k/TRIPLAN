@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+    <title>TRIPLAN</title>
+    <meta content="" name="description">
+    <meta content="" name="keywords">
+
+    <!-- Favicons -->
+    <link href="/img/favicon.png" rel="icon">
+    <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS Files -->
+    <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+    <link href="/vendor/aos/aos.css" rel="stylesheet">
+    <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+    <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+
+    <!-- Template Main CSS File -->
+    <link href="/css/user_styles.css" rel="stylesheet">
+
+    <script	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<style>
+.navbar a {
+    color: rgba(0, 0, 0, 0.7);
+    font-weight: 600;
+}
+.navbar a:hover, .navbar a:active, .navbar .active {
+    color: #000 !important;
+}
+</style>
+<script>
+</script>
+</head>
+<body class="page-index" onload="refresh();initTmap()">
+
+    <div class="plan-container">
+        <!-- ======= Header ======= -->
+        {{>user_header}}
+
+        <div id="plan-header">
+            <div id="plan-head">일정</div>
+            <div id="plan-day"></div>
+            <div class="btn-box">
+                <button id="plan-savebtn" class="basic-btn plan-btn">저장</button>
+                <button id="plan-exitbtn" class="basic-btn plan-btn">나가기</button>
+            </div>
+        </div>
+
+        <div class="plan-col-container">
+            <!--Day 목록-->
+            <!--달력에서 11/3 ~ 11/5 선택하면 DAY 탭 3개 → 장소목록 form 3개 생성-->
+            <div id="plan-daybar" class="plan-col">
+            </div>
+
+            <!--일정 장소목록-->
+            <div id="plan-placebar" class="plan-col">
+                <div class="select-place-btn-box">
+                    <button id="placeOk-btn" class="basic-btn">장소선택 완료 [경로최적화]</button>
+                </div>
+
+                <!--DAY 개수 만큼 있어야 함-->
+                <!--나중에 몇번째 DAY인지, 해당 DAY의 몇 번째 경유지인지 정보도 넣어줘야 함-->
+                <!--form은 하나로 하고 그 안에 div로 day별로 나눌까-->
+                <form class="place-form" action="/triplan/planinsertform" method="post">
+                    <input type="hidden" id="title" name="title" value="">
+                    <input type="hidden" id="start_dt" name="start_dt" value="">
+                    <input type="hidden" id="end_dt" name="end_dt" value="">
+                    <input type="hidden" id="area_code" name="area_code" value="">
+                </form>
+            </div>
+
+            <!--장소 검색-->
+            <div id="plan-searchbar" class="plan-col">
+                <ul class="nav nav-tabs">
+                    <li class="nav-item">
+                        <a id="recommend" class="nav-link active" aria-current="page" href="#">추천 관광지</a>
+                    </li>
+                    <li class="nav-item">
+                        <a id="search" class="nav-link" href="#">검색</a>
+                    </li>
+                </ul>
+
+                <!--1) 관광지 추천 리스트-->
+                <div class="recommend-list">
+                    <div class="region-box">
+                        <select id="areacode" class="region form-select form-select-sm" aria-label=".form-select-sm example">
+                            <option selected value="">--- 지역 ---</option>
+                            {{#areaList}}
+                                <option value="{{code}}">{{name}}</option>
+                            {{/areaList}}
+                        </select>
+                        <select id="sigungucode" class="region form-select form-select-sm" aria-label=".form-select-sm example">
+                            <option selected value="">-- 시군구 --</option>
+                        </select>
+                        <button id="region-search-btn" class="spot-list-btn basic-btn"><i class="bi bi-search"></i></button>
+                        <div class="spot-search-box">
+                            <input type="text" class="text_custom" id="spot-search" placeholder="관광지 이름 검색">
+                            <button type="button" id="spot-search-btn" class="spot-list-btn basic-btn"><i class="bi bi-search"></i></button>
+                        </div>
+                    </div>
+
+                    <div id="tour-list-box">
+                        {{#tourList}}
+                            <div class="rec-list-box">
+                                <img class="rec-img" src="{{imgPath}}">
+                                <div class="rec-content">
+                                    <div class="rec-btn-box">
+                                        <button type="button" class="add-place rec-add-btn" name="{{name}}" loc_x="{{loc_x}}" loc_y="{{loc_y}}" photo_path="{{imgPath}}">
+                                            <i class='bi bi-plus'></i>
+                                        </button>
+                                    </div>
+                                    <span class="name">{{name}}</span>
+                                </div>
+                            </div>
+                        {{/tourList}}
+                    </div>
+                </div>
+
+                <!--2) 지도 검색-->
+                <div class="placelist" style="display: none;">
+                    <div class="map-search-box">
+                        <input type="text" class="text_custom" id="map-search" name="searchKeyword">
+                        <button type="button" id="map-search-btn" class="basic-btn"><i class="bi bi-search"></i></button>
+                    </div>
+                    <div>
+                        <div class="rst_wrap">
+                            <div class="rst mCustomScrollbar">
+                                <ul id="searchResult" name="searchResult"></ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="plan-map" class="plan-col">
+                <div id="map_wrap" class="map_wrap">
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Vendor JS Files -->
+    <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <script src="/vendor/aos/aos.js"></script>
+    <script src="/vendor/glightbox/js/glightbox.min.js"></script>
+    <script src="/vendor/swiper/swiper-bundle.min.js"></script>
+    <script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+    <script src="/vendor/php-email-form/validate.js"></script>
+
+    <!-- Template Main JS File -->
+    <script src="/js/user/main.js"></script>
+
+    <script src="/js/user/map.js"></script>
+    <script src="/js/user/plan.js"></script>
+    <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xx3baa04961c80465ea1fe8a3be504d3e1"></script>
+</body>
+</html>

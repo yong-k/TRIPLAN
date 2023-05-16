@@ -39,7 +39,7 @@ out/
 ## 나중에 추가
 **/src/main/resources/static/vendor
 **/application.properties
-**/src/main/java/com/site/triplan/controller/PlanController.java
-**/src/main/resources/static/js/user/map.js
-**/src/main/resources/templates/user_plan_detail.mustache
-**/src/main/resources/templates/user_plan_insertform.mustache
+# **/src/main/java/com/site/triplan/controller/PlanController.java
+# **/src/main/resources/static/js/user/map.js
+# **/src/main/resources/templates/user_plan_detail.mustache
+# **/src/main/resources/templates/user_plan_insertform.mustache

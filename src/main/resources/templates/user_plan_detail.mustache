@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+  <title>TRIPLAN</title>
+  <meta content="" name="description">
+  <meta content="" name="keywords">
+
+  <!-- Favicons -->
+  <link href="/img/favicon.png" rel="icon">
+  <link href="/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,600;1,700&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Raleway:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="/vendor/aos/aos.css" rel="stylesheet">
+  <link href="/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="/vendor/remixicon/remixicon.css" rel="stylesheet">
+
+  <!-- Template Main CSS File -->
+  <link href="/css/user_styles.css" rel="stylesheet">
+<script	src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<style>
+    .navbar a {
+        color: rgba(0, 0, 0, 0.7);
+        font-weight: 600;
+    }
+    .navbar a:hover, .navbar a:active, .navbar .active {
+        color: #000 !important;
+    }
+</style>
+<script>
+</script>
+</head>
+<body class="page-blog" onload="initTmap()">
+    <!-- ======= Header ======= -->
+    {{>user_header}}
+
+    <main id="main">
+
+        <div id="plan-detail-header">
+            <div id="plan-info">
+                <h2 id="title">{{plan.title}}</h2>
+                <div id="like-icon">
+                    {{^session_id}}
+                        <a href="/triplan/loginform?errCode=2"><i class="bi bi-suit-heart"></i></a>
+                    {{/session_id}}
+                    {{#session_id}}
+                        {{^isLike}}
+                            <a href="/triplan/insertLike?code={{plan.code}}"><i class="bi bi-suit-heart"></i></a>
+                        {{/isLike}}
+                        {{#isLike}}
+                            <a href="/triplan/deleteLike?code={{plan.code}}"><i class="bi bi-suit-heart-fill"></i></a>
+                        {{/isLike}}
+                        <input type="hidden" id="now_user_id" value="{{now_user_id}}">
+                    {{/session_id}}
+                </div>
+                <div>
+                    <p class="plan-date">
+                        {{plan.start_dt}} ~ {{plan.end_dt}}
+                    </p>
+                </div>
+                <div class="meta-top">
+                    <i class="bi bi-person"></i><span id="nickname" class="article-info"
+                                                      data-id="{{plan.id}}">{{plan.nickname}}</span>
+                    <i class="bi bi-geo-alt"></i><span id="placeNum" class="article-info">{{plan.place_num}}</span>
+                    <i class="bi bi-eye"></i><span id="views" class="article-info">{{plan.views}}</span>
+                    </ul>
+                </div>
+            </div>
+            <div id="tab">
+                <span id="planTab" class="tab-name">일정</span>
+                <span id="tab-bar">|</span>
+                <span id="replyTab" class="tab-name">댓글</span>
+
+                <!--본인 글이면 뜨게-->
+                <button id="plan-delete-btn" class="basic-btn plan-detail-btn">삭제</button>
+                <button id="plan-update-btn" class="basic-btn plan-detail-btn">수정</button>
+            </div>
+        </div>
+
+        <!-- ======= Blog Details Section ======= -->
+        <section id="blog" class="blog plan-detail">
+            <div class="container">
+
+                <div class="row g-5">
+
+                    <div class="col-lg-8">
+
+                        <article class="blog-details">
+                            <div id="mateList">
+                                {{#mateList}}
+                                    <div class="mate-id">{{id}}</div>
+                                {{/mateList}}
+                            </div>
+
+                            <!--일정 내용-->
+                            <div class="content">
+
+                                <div class="place-by-day">
+                                    {{#placeList}}
+                                        <div class="place-info post-author d-flex align-items-center"
+                                             data-daynum="{{day}}" data-startday="{{travel_date}}"
+                                             data-loc_x="{{loc_x}}" data-loc_y="{{loc_y}}">
+                                            <img src="{{photo_path}}" class="rounded-circle flex-shrink-0" alt="">
+                                            <div>
+                                                <h4 name="name">{{name}}</h4>
+                                                <p class="memo">
+                                                    {{#memo}}
+                                                        {{memo}}
+                                                    {{/memo}}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    {{/placeList}}
+                                </div>
+
+                            </div>
+                            <!-- End post content -->
+
+
+                            <!-- 댓글 -->
+                            <div class="comments">
+
+                                <h4 class="comments-count">{{plan.reply_num}} Comments</h4>
+
+                                <div class="reply-form">
+                                    <h4>댓글</h4>
+                                    <form id="replyInsertForm" action="/triplan/reply" method="post">
+                                        <div class="row">
+                                            <div class="col form-group">
+                                                <textarea id="insert-reply-comment" name="content" class="form-control"
+                                                          placeholder="내용을 입력하세요."></textarea>
+                                                <button type="button" id="insert-reply-btn" class="basic-btn">등록</button>
+                                                <div class="errMsg" id="replyErrMsg">내용을 입력해주세요.</div>
+                                                <input type="hidden" name="plan_code" value="{{plan.code}}">
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                                <div id="planDetail-reply-box">
+                                    {{#replyList}}
+                                        <div class="reply-outer">
+                                            <div class="comment" id="comment{{code}}">
+                                                <div class="d-flex">
+                                                    <div class="comment-img"><img src="/img/user.png"></div>
+                                                    <div>
+                                                        <h5 class="reply-nickname" data-id="{{id}}">{{nickname}}</h5>
+                                                        <div class="other-reply">
+                                                            <a href="#!" class="reply-option op-report" data-code="{{code}}">신고</a>
+                                                        </div>
+                                                        <div class="my-reply">
+                                                            <a href="/triplan/deleteReply/{{plan.code}}/{{code}}" class="reply-option op-delete" data-code="{{code}}">삭제</a>
+                                                            <a href="#!" class="reply-option op-update" data-code="{{code}}">수정 | </a>
+                                                        </div>
+                                                        <p>
+                                                            {{content}}
+                                                        </p>
+                                                        <time datetime="2020-01-01">{{write_dt}}</time>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="reply-form reply-update-form" id="update{{code}}">
+                                                <form id="replyUpdateForm{{code}}" action="/triplan/updateReply" method="post">
+                                                    <div class="row">
+                                                        <div class="col form-group">
+                                                            <textarea id="update-reply-comment" name="content" class="form-control"
+                                                              placeholder="내용을 입력하세요.">{{content}}</textarea>
+                                                            <button type="button" class="update-reply-btn basic-btn" value="{{code}}">수정</button>
+                                                            <div class="errMsg" id="replyErrMsg{{code}}">내용을 입력해주세요.</div>
+                                                            <input type="hidden" name="code" value="{{code}}">
+                                                            <input type="hidden" name="plan_code" value="{{plan.code}}">
+                                                        </div>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    {{/replyList}}
+                                </div>
+
+                            </div>
+
+                        </article>
+
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="sidebar ps-lg-4">
+                            <div class="plan-detail-map sidebar-item recent-posts">
+                                <select name="day" id="day-select-box" class="form-select">
+                                    <option selected value="1">DAY1</option>
+                                </select>
+                                <div id="map_wrap" class="map_wrap">
+                                    <div id='map_div1' class="map"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+  <!-- ======= Footer ======= -->
+  {{>user_footer}}
+
+  <a href="#" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="/vendor/aos/aos.js"></script>
+  <script src="/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="/vendor/isotope-layout/isotope.pkgd.min.js"></script>
+  <script src="/vendor/php-email-form/validate.js"></script>
+
+  <!-- Template Main JS File -->
+  <script src="/js/user/main.js"></script>
+
+  <script src="/js/user/plan_detail.js"></script>
+  <script src="https://apis.openapi.sk.com/tmap/jsv2?version=1&appKey=l7xx3baa04961c80465ea1fe8a3be504d3e1"></script>
+
+</body>
+</html>
