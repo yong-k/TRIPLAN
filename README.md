@@ -2,6 +2,9 @@
 #### 💭 TRIPLAN = TRIP(여행) + PLANNER(플래너)<br>
 ![main-logo](https://user-images.githubusercontent.com/99342672/205441700-767db26b-a89c-4a1c-989e-d39bf6bb66ae.png)
 
+🔊 <b>더 많은 개발 내용과 사이트 UI는 블로그에서도 확인 가능합니다.</b><br>
+[(Click!)블로그GO: 트리플랜 내용 보러 가기](https://yong-codinglog.tistory.com/category/PROJECT/TRIPLAN%28%EC%97%AC%ED%96%89%20%ED%94%8C%EB%9E%98%EB%84%88%29)
+
 ## 📚 기술 스택
 - 개발 언어: Java
 - 개발 환경: IntelliJ
